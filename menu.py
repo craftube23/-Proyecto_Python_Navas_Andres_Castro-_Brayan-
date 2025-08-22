@@ -10,4 +10,4 @@ while True:
 
     if opcion == "1":
         while True:
-            print(' 🤖 Menu Camper 🤖 ')
+            print(' 🤖 Menu Camper 🤖 '
