@@ -137,16 +137,16 @@ def registrar_camper():
     clear()
     print("===== Registro de Camper =====")
     camper = {
-        "id": input("Identificación: ").strip(),
-        "nombres": input("Nombres: ").strip(),
-        "apellidos": input("Apellidos: ").strip(),
+        "id": int(input("Identificación: ").strip()),
+        "nombres": str(input("Nombres: ")).capitalize().strip(),
+        "apellidos": str(input("Apellidos: ")).capitalize().strip(),
         "direccion": input("Dirección: ").strip(),
-        "acudiente": input("Acudiente: ").strip(),
+        "acudiente": str(input("Acudiente: ")).capitalize().strip(),
         "telefonos": {
-            "celular": input("Teléfono celular: ").strip(),
-            "fijo": input("Teléfono fijo: ").strip()
+            "celular": int(input("Teléfono celular: ").strip()),
+            "fijo": int(input("Teléfono fijo: ").strip())
         },
-        "estado": "Inscrito",            # alineado con enunciado
+        "estado": "proceso de ingreso ",            # alineado con enunciado
         "riesgo": None,
         "ruta": None,                    # se asigna tras aprobar
         "notas": [],                     # histórico de pruebas iniciales u otras
@@ -191,7 +191,8 @@ def menu_camper():
 # =========================================================
 def editar_camper_coordinador():
     ver_campers()
-    cid = input("Ingrese el ID del camper a editar: ").strip()
+    cid = int(input("Ingrese el ID del camper a editar: ").strip())
+
     c = buscar_camper_por_id(cid)
     if not c:
         print("⚠️ Camper no encontrado.")
@@ -201,12 +202,12 @@ def editar_camper_coordinador():
     print("=== Edición de Camper ===")
     print("Deja vacío si no deseas cambiar un campo.\n")
 
-    c["nombres"] = input(f"Nombres ({c['nombres']}): ").strip() or c["nombres"]
-    c["apellidos"] = input(f"Apellidos ({c['apellidos']}): ").strip() or c["apellidos"]
+    c["nombres"] = str(input(f"Nombres ({c['nombres']}): ").strip() or c["nombres"])
+    c["apellidos"] = str(input(f"Apellidos ({c['apellidos']}): ").strip() or c["apellidos"])
     c["direccion"] = input(f"Dirección ({c['direccion']}): ").strip() or c["direccion"]
-    c["acudiente"] = input(f"Acudiente ({c['acudiente']}): ").strip() or c["acudiente"]
-    c["telefonos"]["celular"] = input(f"Celular ({c['telefonos']['celular']}): ").strip() or c["telefonos"]["celular"]
-    c["telefonos"]["fijo"] = input(f"Fijo ({c['telefonos']['fijo']}): ").strip() or c["telefonos"]["fijo"]
+    c["acudiente"] = str(input(f"Acudiente ({c['acudiente']}): ").strip() or c["acudiente"])
+    c["telefonos"]["celular"] = int(input(f"Celular ({c['telefonos']['celular']}): ".strip()) or c["telefonos"]["celular"])
+    c["telefonos"]["fijo"] = int(input(f"Fijo ({c['telefonos']['fijo']}): ".strip()) or c["telefonos"]["fijo"])
 
     # Cambio de estado manual opcional
     est = input(f"Estado actual ({c['estado']}) [Enter para no cambiar]: ").strip()
@@ -220,7 +221,8 @@ def editar_camper_coordinador():
 def registrar_prueba_inicial():
     # Coordinador registra nota teórica/práctica de examen inicial
     ver_campers()
-    cid = input("Ingrese el ID del camper a calificar (prueba inicial): ").strip()
+    cid = int(input("Ingrese el ID del camper a calificar (prueba inicial): ").strip())
+
     c = buscar_camper_por_id(cid)
     if not c:
         print("⚠️ Camper no encontrado.")
@@ -252,35 +254,46 @@ def registrar_prueba_inicial():
     pause()
 
 def asignar_ruta_coordinador():
-    # Solo Aprobados pueden recibir ruta, y no superar capacidad simple (concurrente Cursando)
-    ver_campers()
-    cid = input("ID del camper Aprobado para asignar ruta: ").strip()
-    c = buscar_camper_por_id(cid)
-    if not c:
-        print("⚠️ Camper no encontrado.")
-        pause(); return
-    if c["estado"] != "Aprobado":
-        print("⚠️ Solo se pueden asignar rutas a campers en estado 'Aprobado'.")
-        pause(); return
-
     clear()
-    print("Rutas disponibles:")
-    listar_rutas()
-    ruta = seleccionar_ruta_por_indice()
-    if not ruta:
-        pause(); return
+    print("===== Asignar Ruta a Camper =====")
+    cid = int(input("ID del camper Aprobado para asignar ruta: ").strip())
+    camper = buscar_camper_por_id(cid)
 
-    # Control de capacidad simple: contar cursando en esa ruta
-    cursando_en_ruta = campers_en_ruta(ruta["nombre"], estados=["Cursando"])
-    if len(cursando_en_ruta) >= ruta["capacidad"]:
-        print("❌ Capacidad de la ruta alcanzada (concurrente).")
-        pause(); return
+    if not camper:
+        print("❌ Camper no encontrado.")
+        return pause()
 
-    c["ruta"] = ruta["nombre"]
-    c["estado"] = "Cursando"
+    if camper["estado"] != "Aprobado":
+        print("❌ El camper no está en estado 'Aprobado'.")
+        return pause()
+
+    # Mostrar rutas disponibles
+    print("\nRutas disponibles:")
+    for i, ruta in enumerate(DB["rutas"], start=1):
+        print(f"{i}. {ruta['nombre']} (Cupos: {ruta['capacidad']})")
+
+    try:
+        opcion = int(input("Seleccione la ruta: "))
+        ruta = DB["rutas"][opcion - 1]
+    except (ValueError, IndexError):
+        print("❌ Opción inválida.")
+        return pause()
+
+    # Verificar capacidad
+    if ruta["capacidad"] <= 0:
+        print(f"❌ La ruta {ruta['nombre']} ya está llena. Intente con otra.")
+        return pause()
+
+    # Asignar camper a la ruta
+    camper["ruta"] = ruta["nombre"]
+    camper["estado"] = "Cursando"
+    ruta["capacidad"] -= 1  # Restar cupo
     guardar_db()
-    print(f"✅ Ruta '{c['ruta']}' asignada. Estado → Cursando.")
+
+    print(f"✅ Camper {camper['nombres']} asignado a la ruta {ruta['nombre']}.")
+    print(f"📉 Cupos restantes: {ruta['capacidad']}")
     pause()
+
 
 def reportes():
     clear()
@@ -345,8 +358,8 @@ def registrar_trainer():
     clear()
     print("===== Registrar Trainer =====")
     trainer = {
-        "id": input("ID del trainer: ").strip(),
-        "nombre": input("Nombre completo: ").strip(),
+        "id": int(input("ID del trainer: ").strip()),
+        "nombre": str(input("Nombre completo: ")).capitalize().strip(),
         "rutas_asignadas": [],   # nombres de rutas
         "horario": input("Horario (texto libre): ").strip()
     }

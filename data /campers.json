@@ -1,1 +1,142 @@
-[]
+{
+    "__================== CAMPERS =================__": "Listado de campers matriculados o en proceso",
+    "campers": [
+        {
+            "id": "8",
+            "nombres": "q",
+            "apellidos": "w",
+            "direccion": "q",
+            "acudiente": "w",
+            "telefonos": {
+                "celular": "8",
+                "fijo": "8"
+            },
+            "estado": "Aprobado",
+            "riesgo": "Bajo",
+            "ruta": null,
+            "notas": [
+                {
+                    "tipo": "prueba_inicial",
+                    "teoria": 85.0,
+                    "practica": 95.0,
+                    "quices": 85.0,
+                    "final": 91.0
+                }
+            ],
+            "modulos": {}
+        },
+        {
+            "id": "123213",
+            "nombres": "21321321",
+            "apellidos": "123213",
+            "direccion": "1231123",
+            "acudiente": "12312321",
+            "telefonos": {
+                "celular": "sadsad",
+                "fijo": "asdsad"
+            },
+            "estado": "Inscrito",
+            "riesgo": "Alto",
+            "ruta": null,
+            "notas": [
+                {
+                    "tipo": "prueba_inicial",
+                    "teoria": 0.0,
+                    "practica": 0.0,
+                    "quices": -0.0,
+                    "final": 0.0
+                }
+            ],
+            "modulos": {}
+        },
+        {
+            "id": 85,
+            "nombres": "Carlos",
+            "apellidos": "Navas",
+            "direccion": "asda",
+            "acudiente": "78",
+            "telefonos": {
+                "celular": 45,
+                "fijo": 44
+            },
+            "estado": "proceso de ingreso ",
+            "riesgo": null,
+            "ruta": null,
+            "notas": [],
+            "modulos": {}
+        },
+        {
+            "id": 96,
+            "nombres": "Felipe",
+            "apellidos": "Nevsa",
+            "direccion": "sad",
+            "acudiente": "Ser",
+            "telefonos": {
+                "celular": 4,
+                "fijo": 4
+            },
+            "estado": "proceso de ingreso ",
+            "riesgo": null,
+            "ruta": null,
+            "notas": [],
+            "modulos": {}
+        }
+    ],
+
+    "__================== TRAINERS =================__": "Listado de trainers y sus rutas asignadas",
+    "trainers": [
+        {
+            "id": "32",
+            "nombre": "roben",
+            "rutas_asignadas": [
+                "NodeJS"
+            ],
+            "horario": "pm"
+        },
+        {
+            "id": "Gordo",
+            "nombre": "123213",
+            "rutas_asignadas": [
+                "NetCore"
+            ],
+            "horario": "todo el dia sin paga"
+        }
+    ],
+
+    "__================== RUTAS =================__": "Listado de rutas con sus módulos",
+    "rutas": [
+        {
+            "nombre": "NodeJS",
+            "capacidad": 33,
+            "modulos": [
+                "Fundamentos de programación",
+                "Programación Web",
+                "Programación formal",
+                "Bases de datos",
+                "Backend"
+            ]
+        },
+        {
+            "nombre": "Java",
+            "capacidad": 33,
+            "modulos": [
+                "Fundamentos de programación",
+                "Programación Web",
+                "Programación formal",
+                "Bases de datos",
+                "Backend"
+            ]
+        },
+        {
+            "nombre": "NetCore",
+            "capacidad": 33,
+            "modulos": [
+                "Fundamentos de programación",
+                "Programación Web",
+                "Programación formal",
+                "Bases de datos",
+                "Backend"
+            ]
+        }
+    ]
+}
