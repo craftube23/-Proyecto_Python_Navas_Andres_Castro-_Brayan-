@@ -1,0 +1,56 @@
+{
+    "campers": [
+        {
+            "id": 45,
+            "nombres": "Dfg",
+            "apellidos": "Dfg",
+            "direccion": "dfg",
+            "acudiente": "Dfg",
+            "telefonos": {
+                "celular": 54,
+                "fijo": "3"
+            },
+            "estado": "proceso de ingreso ",
+            "riesgo": null,
+            "ruta": null,
+            "notas": [],
+            "modulos": {}
+        }
+    ],
+    "trainers": [],
+    "rutas": [
+        {
+            "nombre": "NodeJS",
+            "capacidad": 33,
+            "modulos": [
+                "Fundamentos de programación",
+                "Programación Web",
+                "Programación formal",
+                "Bases de datos",
+                "Backend"
+            ]
+        },
+        {
+            "nombre": "Java",
+            "capacidad": 33,
+            "modulos": [
+                "Fundamentos de programación",
+                "Programación Web",
+                "Programación formal",
+                "Bases de datos",
+                "Backend"
+            ]
+        },
+        {
+            "nombre": "NetCore",
+            "capacidad": 33,
+            "modulos": [
+                "Fundamentos de programación",
+                "Programación Web",
+                "Programación formal",
+                "Bases de datos",
+                "Backend"
+            ]
+        }
+    ]
+}
