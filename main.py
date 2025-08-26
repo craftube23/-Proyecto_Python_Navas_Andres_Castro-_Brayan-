@@ -4,7 +4,7 @@ import json
 # =========================================================
 #                 PERSISTENCIA 
 # =========================================================
-FILE = "data/campers.json"
+FILE = "data/datos.json"
 
 # Estructura por defecto del "DB"
 DEFAULT_DB = {
@@ -71,6 +71,8 @@ def cargar_db():
         DB = DEFAULT_DB.copy()
 
 def guardar_db():
+    # Crear carpeta si no existe
+    os.makedirs(os.path.dirname(FILE), exist_ok=True)
     with open(FILE, "w", encoding="utf-8") as f:
         json.dump(DB, f, indent=4, ensure_ascii=False)
 
@@ -144,13 +146,14 @@ def registrar_camper():
         "acudiente": str(input("Acudiente: ")).capitalize().strip(),
         "telefonos": {
             "celular": int(input("Teléfono celular: ").strip()),
-            "fijo": int(input("Teléfono fijo: ").strip())
+            # Si el campo está vacío → None
+            "fijo": input("Teléfono fijo (opcional): ").strip() or None
         },
-        "estado": "proceso de ingreso ",            # alineado con enunciado
+        "estado": "proceso de ingreso ",
         "riesgo": None,
-        "ruta": None,                    # se asigna tras aprobar
-        "notas": [],                     # histórico de pruebas iniciales u otras
-        "modulos": {}                    # notas por módulo (llenado por Trainer)
+        "ruta": None,
+        "notas": [],
+        "modulos": {}
     }
     # Evitar duplicados
     if buscar_camper_por_id(camper["id"]):
@@ -160,6 +163,7 @@ def registrar_camper():
         guardar_db()
         print("✅ Camper registrado exitosamente.")
     pause()
+
 
 def ver_campers():
     clear()
@@ -206,8 +210,14 @@ def editar_camper_coordinador():
     c["apellidos"] = str(input(f"Apellidos ({c['apellidos']}): ").strip() or c["apellidos"])
     c["direccion"] = input(f"Dirección ({c['direccion']}): ").strip() or c["direccion"]
     c["acudiente"] = str(input(f"Acudiente ({c['acudiente']}): ").strip() or c["acudiente"])
-    c["telefonos"]["celular"] = int(input(f"Celular ({c['telefonos']['celular']}): ".strip()) or c["telefonos"]["celular"])
-    c["telefonos"]["fijo"] = int(input(f"Fijo ({c['telefonos']['fijo']}): ".strip()) or c["telefonos"]["fijo"])
+    # Celular sí es obligatorio, entonces solo validamos si lo dejan vacío
+    celular_input = input(f"Celular ({c['telefonos']['celular']}): ").strip()
+    if celular_input:
+        c["telefonos"]["celular"] = int(celular_input)
+
+    # Teléfono fijo opcional → si está vacío lo dejamos como None
+    fijo_input = input(f"Fijo ({c['telefonos'].get('fijo')}): ").strip()
+    c["telefonos"]["fijo"] = fijo_input if fijo_input else None
 
     # Cambio de estado manual opcional
     est = input(f"Estado actual ({c['estado']}) [Enter para no cambiar]: ").strip()
@@ -256,7 +266,16 @@ def registrar_prueba_inicial():
 def asignar_ruta_coordinador():
     clear()
     print("===== Asignar Ruta a Camper =====")
-    cid = int(input("ID del camper Aprobado para asignar ruta: ").strip())
+
+    # Validación robusta del ID
+    while True:
+        cid_input = input("ID del camper Aprobado para asignar ruta: ").strip()
+        if cid_input.isdigit():
+            cid = int(cid_input)
+            break
+        else:
+            print("⚠️ Debe ingresar un número válido.")
+
     camper = buscar_camper_por_id(cid)
 
     if not camper:
@@ -272,12 +291,17 @@ def asignar_ruta_coordinador():
     for i, ruta in enumerate(DB["rutas"], start=1):
         print(f"{i}. {ruta['nombre']} (Cupos: {ruta['capacidad']})")
 
-    try:
-        opcion = int(input("Seleccione la ruta: "))
-        ruta = DB["rutas"][opcion - 1]
-    except (ValueError, IndexError):
-        print("❌ Opción inválida.")
-        return pause()
+    # Validación de selección de ruta
+    while True:
+        try:
+            opcion = int(input("Seleccione la ruta: "))
+            if 1 <= opcion <= len(DB["rutas"]):
+                ruta = DB["rutas"][opcion - 1]
+                break
+            else:
+                print("⚠️ Número fuera de rango.")
+        except ValueError:
+            print("⚠️ Debe ingresar un número.")
 
     # Verificar capacidad
     if ruta["capacidad"] <= 0:
@@ -293,7 +317,6 @@ def asignar_ruta_coordinador():
     print(f"✅ Camper {camper['nombres']} asignado a la ruta {ruta['nombre']}.")
     print(f"📉 Cupos restantes: {ruta['capacidad']}")
     pause()
-
 
 def reportes():
     clear()
@@ -561,4 +584,16 @@ def menu_principal():
             break
 
 if __name__ == "__main__":
+    while True:
+        try:
+            menu_principal()
+            break  # Si sale normalmente con "Salir", rompemos el ciclo
+        except Exception as e:
+            clear()
+            print("❌ Ha ocurrido un error inesperado:", e)
+            print("🔄 Regresando al menú principal...\n")
+            pause()
+
     menu_principal()
+    
+    
