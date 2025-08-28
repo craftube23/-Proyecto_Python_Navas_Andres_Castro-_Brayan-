@@ -17,7 +17,6 @@
             "modulos": {}
         }
     ],
-    "trainers": [],
     "rutas": [
         {
             "nombre": "NodeJS",
