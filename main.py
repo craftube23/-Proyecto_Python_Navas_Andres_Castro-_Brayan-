@@ -5,11 +5,15 @@ import json
 #                 PERSISTENCIA 
 # =========================================================
 FILE = "data/datos.json"
+FILE1 = "data/config_evaluacion.json"
 
+DEFAULT_CE = {"trainers": []
+    
+}
+CE = DEFAULT_CE.copy()
 # Estructura por defecto del "DB"
 DEFAULT_DB = {
     "campers": [],
-    "trainers": [],
     "rutas": [
         {
             "nombre": "NodeJS",
@@ -48,6 +52,36 @@ DEFAULT_DB = {
 }
 
 DB = DEFAULT_DB.copy()
+
+#=======================================================================
+#                       parte de la evauacion
+#=======================================================================
+def cargar_CE():
+    global CE
+    if os.path.exists(FILE1):
+        with open(FILE1, "r", encoding="utf-8") as f:
+            try:
+                datos = json.load(f)
+                # Compatibilidad: si era lista de campers antes
+                if isinstance(datos, list):
+                    DE = DEFAULT_CE.copy()
+                    DE["trainers"] = datos
+                elif isinstance(datos, dict):
+                    # mezclar con defaults por si faltan llaves
+                    CE = DEFAULT_CE.copy()
+                    CE.update({k: v for k, v in datos.items() if k in DEFAULT_CE})
+                else:
+                    CE = DEFAULT_CE.copy()
+            except json.JSONDecodeError:
+                CE = DEFAULT_CE.copy()
+    else:
+        CE = DEFAULT_CE.copy()
+
+def guardar_CE():
+    # Crear carpeta si no existe
+    os.makedirs(os.path.dirname(FILE1), exist_ok=True)
+    with open(FILE1, "w", encoding="utf-8") as f:
+        json.dump(CE, f, indent=4, ensure_ascii=False)
 
 def cargar_db():
     global DB
@@ -93,7 +127,7 @@ def buscar_camper_por_id(cid):
     return None
 
 def buscar_trainer_por_id(tid):
-    for t in DB["trainers"]:
+    for t in CE["trainers"]:
         if t["id"] == tid:
             return t
     return None
@@ -389,18 +423,18 @@ def registrar_trainer():
     if buscar_trainer_por_id(trainer["id"]):
         print("❌ Ya existe un trainer con ese ID.")
     else:
-        DB["trainers"].append(trainer)
-        guardar_db()
+        CE["trainers"].append(trainer)
+        guardar_CE()
         print("✅ Trainer registrado.")
     pause()
 
 def listar_trainers():
     clear()
     print("===== Trainers =====")
-    if not DB["trainers"]:
+    if not CE["trainers"]:
         print("(sin trainers)")
     else:
-        for t in DB["trainers"]:
+        for t in CE["trainers"]:
             rutas = ", ".join(t["rutas_asignadas"]) if t["rutas_asignadas"] else "—"
             print(f"{t['id']} - {t['nombre']} | Rutas: {rutas} | Horario: {t['horario']}")
     pause()
@@ -584,16 +618,16 @@ def menu_principal():
             break
 
 if __name__ == "__main__":
-    while True:
-        try:
-            menu_principal()
-            break  # Si sale normalmente con "Salir", rompemos el ciclo
-        except Exception as e:
-            clear()
-            print("❌ Ha ocurrido un error inesperado:", e)
-            print("🔄 Regresando al menú principal...\n")
-            pause()
+   while True:
+       try:
+           menu_principal()
+           break  # Si sale normalmente con "Salir", rompemos el ciclo
+       except Exception as e:
+           clear()
+           print("❌ Ha ocurrido un error inesperado:", e)
+           print("🔄 Regresando al menú principal...\n")
+           pause()
 
-    menu_principal()
+menu_principal()
     
     
